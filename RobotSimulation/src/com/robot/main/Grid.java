@@ -143,7 +143,7 @@ public class Grid {
             {
             	int index = t.positionX + (t.positionY * b.boardWidth);
                 StringRectangle cell = cells.get(index);
-               // cell.setLabel(t.bot.health);
+                cell.setLabel(t.bot.getRepresentationString());
             	gp.updateGrid(g2d, cell, b.boardWidth, t);
             }
             	

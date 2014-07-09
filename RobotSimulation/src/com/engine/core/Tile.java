@@ -8,6 +8,7 @@ import com.engine.intelligence.Bot;
 import com.engine.types.TileDirection;
 import com.engine.types.TileState;
 import com.engine.types.TileType;
+import com.engine.util.Util;
 
 public class Tile {
 	public Board b;
@@ -109,7 +110,7 @@ public class Tile {
 	{
 		int boardEndPointX = b.boardWidth;
 		int boardEndPointY = b.boardLength;
-		int topTile = this.positionY +1;
+		int topTile = this.positionY -1;
 		if(topTile > boardEndPointX)
 		{
 			return TileState.Y_END;
@@ -130,7 +131,7 @@ public class Tile {
 	}
 	public TileState getBottomState()
 	{
-		int bottomTile = this.positionY -1;
+		int bottomTile = this.positionY +1;
 		if(bottomTile < 0)
 		{
 			return TileState.Y_START;
@@ -170,6 +171,54 @@ public class Tile {
 		}
 	}
 	
+	public Tile getTopTile()
+	{
+		if(getTopState() == TileState.FILLED)
+		{
+			return b.getTileByCoordinates(this.positionX, this.positionY-1);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public Tile getBottomTile()
+	{
+		if(getBottomState() == TileState.FILLED)
+		{
+			return b.getTileByCoordinates(this.positionX, this.positionY+1);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public Tile getRightTile()
+	{
+		if(getRightState() == TileState.FILLED)
+		{
+			return b.getTileByCoordinates(this.positionX+1, this.positionY);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public Tile getLeftTile()
+	{
+		if(getLeftState() == TileState.FILLED)
+		{
+			return b.getTileByCoordinates(this.positionX-1, this.positionY);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	public void moveUp()
 	{
 		this.positionY = this.positionY -1;
@@ -186,6 +235,12 @@ public class Tile {
 	public void moveLeft()
 	{
 		this.positionX = this.positionX -1;
+	}
+	
+	public void attackTile(Tile tile)
+	{
+		int damage = Util.randInt(5, 15);
+		tile.bot.decrementHealth(damage);
 	}
 	
 }

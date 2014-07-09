@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.engine.actions.Action;
+import com.engine.actions.AttackAction;
 import com.engine.actions.CompleteAction;
 import com.engine.actions.MoveAction;
 import com.engine.core.Tile;
@@ -40,23 +41,7 @@ public class AverageBot extends Bot {
 		{
 			if(tile.getEnemyList().size() > 0)
 			{
-				TileDirection direction=Util.getDirection(tile,getClosestBot());
-				if(Util.checkIfEdge(tile, direction))
-				{
-					MoveAction moveAction = new MoveAction();
-					moveAction.direction = direction;
-					moveAction.tile = tile;
-					//tile.moveTile(direction);
-					return moveAction;
-				}
-				else
-				{
-					MoveAction moveAction = new MoveAction();
-					moveAction.direction = Util.getOppositeDirection(direction);
-					moveAction.tile = tile;
-					//tile.moveTile(direction);
-					return moveAction;
-				}
+				return moveToNearestEnemy();
 			}
 			else
 			{
@@ -64,15 +49,51 @@ public class AverageBot extends Bot {
 				return win;
 			}
 		}
+		else if(tile.getRightState() == TileState.FILLED)
+		{
+			AttackAction attack = new AttackAction();
+			attack.attackingTile = tile;
+			attack.recievingTile = tile.getRightTile();
+			return attack;
+		}
+		else if(tile.getLeftState() == TileState.FILLED)
+		{
+			AttackAction attack = new AttackAction();
+			attack.attackingTile = tile;
+			attack.recievingTile = tile.getLeftTile();
+			return attack;
+		}
 		else
 		{
+			return moveToNearestEnemy();
+//			MoveAction moveAction = new MoveAction();
+//			moveAction.direction = TileDirection.UP;
+//			moveAction.tile = tile;
+//			//tile.moveTile(direction);
+//			return moveAction;
+		}
+		
+	}
+	
+	public Action moveToNearestEnemy()
+	{
+		TileDirection direction=Util.getDirection(tile,getClosestBot());
+		if(!Util.checkIfEdge(tile, direction))
+		{
 			MoveAction moveAction = new MoveAction();
-			moveAction.direction = TileDirection.UP;
+			moveAction.direction = direction;
 			moveAction.tile = tile;
 			//tile.moveTile(direction);
 			return moveAction;
 		}
-		
+		else
+		{
+			MoveAction moveAction = new MoveAction();
+			moveAction.direction = Util.getOppositeDirection(direction);
+			moveAction.tile = tile;
+			//tile.moveTile(direction);
+			return moveAction;
+		}
 	}
 	
 	public boolean emptyFirstLevel()
@@ -92,7 +113,7 @@ public class AverageBot extends Bot {
 		Map<Double, Tile> distanceList = new HashMap<Double, Tile>();
 		for(Tile t: tile.b.tileList)
 		{
-			if(!t.equals(tile))
+			if(!t.equals(tile) && t.tileType != tile.tileType)
 			{
 				double x1 = tile.positionX;
 				double x2 = t.positionX;
@@ -105,18 +126,25 @@ public class AverageBot extends Bot {
 		return sortedDistances.firstEntry().getValue();
 	}
 	
-	public Tile getTile() {
-		return tile;
-	}
-	public void setTile(Tile tile) {
-		this.tile = tile;
-	}
-	public void decrementHealth(int amount)
-	{
-		this.health = this.health - amount;
-	}
 	public void incrementHealth(int amount) {
 		this.health = this.health + amount;
+	}
+	
+	public String getRepresentationString()
+	{
+		return String.valueOf(this.health);
+	}
+
+	@Override
+	public void decrementHealth(int amount) {
+		this.health = this.health - amount;
+		
+	}
+
+	@Override
+	public int getHealth() {
+		// TODO Auto-generated method stub
+		return health;
 	}
 
 }
